@@ -73,23 +73,47 @@ ansible-playbook openshift-deployment.yml --tags down
 
 ## Initial Setup
 
-This "Initial Setup" section was put together as I set up on my Fedora 27 system.  Your mileage may vary.
+This "Initial Setup" section was put together as I set up on my Fedora 29 system. Your mileage may vary.
 
-### Install docker and docker-compose
+### Install podman and make
+
+Make sure you have podman installed and running on your system.
+
 ~~~bash
-sudo dnf install docker docker-compose # install packages
-sudo systemctl start docker # Start docker.
-sudo docker run hello-world # Make sure it's working...
+sudo dnf install podman
 ~~~
-If you get output that says "Hello from Docker!" you've successfully
-installed Docker. Continue the set up...
 
+Also you need to have GNU make installed.
+
+~~~bash
+sudo dnf install make
+~~~
+
+Test your podman.
+
+~~~bash
+podman run -dt -p 8080 -e HTTPD_VAR_RUN=/var/run/httpd -e HTTPD_MAIN_CONF_D_PATH=/etc/httpd/conf.d \
+                       -e HTTPD_MAIN_CONF_PATH=/etc/httpd/conf \
+                       -e HTTPD_CONTAINER_SCRIPTS_PATH=/usr/share/container-scripts/httpd/ \
+                       registry.fedoraproject.org/f29/httpd /usr/bin/run-httpd
+~~~
+
+Test the running server.
+
+~~~bash
+curl http://<IP_address>:8080
+~~~
+
+### Openshift deployment
 
 For OpenShift deployment install also following tools.
 ~~~bash
 sudo dnf install origin-clients ansible
 ~~~
 
+===================================================
+
+## OUTDATED
 ### Prepare Setup for Development
 - Start docker at boot.
 - Add docker group and your user to it. This will allow you to run
@@ -106,6 +130,8 @@ Then log back in and test running docker as your user.
 docker run hello-world
 ~~~
 Look for "Hello from Docker!" again.
+
+===================================================
 
 ### First Run of VMaaS
 
