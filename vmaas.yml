@@ -1,0 +1,404 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2019-09-26T13:52:23Z"
+  labels:
+    app: vmaas
+  name: vmaas
+spec:
+  containers:
+  - command:
+      - run-postgresql
+    env:
+    - name: PATH
+      value: /opt/app-root/src/bin:/opt/app-root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    - name: TERM
+      value: xterm
+    - name: HOSTNAME
+    - name: container
+      value: podman
+    - name: BASH_ENV
+      value: /usr/share/container-scripts/postgresql/scl_enable
+    - name: ENV
+      value: /usr/share/container-scripts/postgresql/scl_enable
+    - name: POSTGRESQL_PREV_VERSION
+      value: "9.6"
+    - name: STI_SCRIPTS_URL
+      value: image:///usr/libexec/s2i
+    - name: POSTGRESQL_PASSWORD
+      value: vmaas_admin_pwd
+    - name: POSTGRESQL_WRITER_PASSWORD
+      value: vmaas_writer_pwd
+    - name: POSTGRESQL_PORT
+      value: "5432"
+    - name: STI_SCRIPTS_PATH
+      value: /usr/libexec/s2i
+    - name: APP_ROOT
+      value: /opt/app-root
+    - name: HOME
+      value: /var/lib/pgsql
+    - name: APP_DATA
+      value: /opt/app-root
+    - name: POSTGRESQL_READER_PASSWORD
+      value: vmaas_reader_pwd
+    - name: MANIFEST_PREFIX
+      value: mgmt_services:latest:vmaas-database\/
+    - name: PGUSER
+      value: postgres
+    - name: MANIFEST_PATH
+      value: /opt/app-root/manifest.txt
+    - name: VMAAS_VERSION
+      value: latest
+    - name: POSTGRESQL_USER
+      value: vmaas_admin
+    - name: POSTGRESQL_DATABASE
+      value: vmaas
+    - name: PROMPT_COMMAND
+      value: . /usr/share/container-scripts/postgresql/scl_enable
+    - name: POSTGRESQL_VERSION
+      value: "10"
+    - name: POSTGRESQL_HOST
+      value: vmaas_database
+    - name: SUMMARY
+      value: PostgreSQL is an advanced Object-Relational database management system
+    - name: CONTAINER_SCRIPTS_PATH
+      value: /usr/share/container-scripts/postgresql
+    - name: DESCRIPTION
+      value: PostgreSQL is an advanced Object-Relational database management system
+        (DBMS). The image contains the client and server programs that you'll need
+        to create, run, maintain and access a PostgreSQL DBMS server.
+    - name: PLATFORM
+      value: el7
+    - name: ENABLED_COLLECTIONS
+      value: rh-postgresql10
+    image: localhost/vmaas/database:latest
+    name: vmaas-database
+    resources: {}
+    securityContext:
+        allowPrivilegeEscalation: true
+        capabilities: {}
+        privileged: false
+        readOnlyRootFilesystem: false
+        runAsUser: 26
+    volumeMounts:
+      - mountPath: /var/lib/pgsql/11/data
+        name: var-lib-containers-storage-volumes-vmaas_vmaas-db-data-_data
+    workingDir: /opt/app-root/src
+  - command:
+      - /bin/sh
+      - -c
+      - /websocket/websocket.py
+    env:
+    - name: PATH
+      value: /opt/rh/rh-python36/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    - name: TERM
+      value: xterm
+    - name: HOSTNAME
+    - name: container
+      value: podman
+    - name: LC_ALL
+      value: en_US.utf8
+    - name: LANG
+      value: en_US.utf8
+    - name: VMAAS_VERSION
+      value: latest
+    - name: MANIFEST_PREFIX
+      value: mgmt_services:latest:vmaas-websocket\/
+    - name: MANIFEST_PYTHON
+      value: python
+    name: vmaas-websocket
+    image: localhost/vmaas/websocket:latest
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: true
+      capabilities: {}
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsUser: 1000
+    ports:
+      - containerPort: 8082
+        hostPort: 8082
+        protocol: TCP
+    workingDir: /websocket
+  - command:
+    - /bin/sh
+    - -c
+    - /webapp/entrypoint.sh
+    env:
+    - name: PATH
+      value: /opt/rh/rh-python36/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    - name: TERM
+      value: xterm
+    - name: HOSTNAME
+    - name: container
+      value: podman
+    - name: LANG
+      value: en_US.utf8
+    - name: WEBSOCKET_HOST
+      value: vmaas_websocket
+    - name: MAX_VMAAS_SERVERS
+      value: "1"
+    - name: HOTCACHE_PRUNING
+      value: "1024"
+    - name: LC_ALL
+      value: en_US.utf8
+    - name: MANIFEST_PREFIX
+      value: mgmt_services:latest:vmaas-webapp\/
+    - name: REPOSCAN_HOST
+      value: vmaas_reposcan
+    - name: VMAAS_VERSION
+      value: latest
+    - name: HOTCACHE_LEVELS
+      value: "11"
+    - name: MANIFEST_PYTHON
+      value: python
+    - name: LOGGING_LEVEL
+      value: INFO
+    - name: LOGGING_TYPE
+      value: DEVEL
+    - name: HOTCACHE_ENABLED
+      value: "YES"
+    image: localhost/vmaas/webapp:latest
+    name: vmaas-webapp
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: true
+      capabilities: {}
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsUser: 1000
+    ports:
+      - containerPort: 8080
+        hostPort: 8080
+        protocol: TCP
+    workingDir: /webapp
+  - command:
+    - /bin/sh
+    - -c
+    - /reposcan/entrypoint.sh
+    env:
+    - name: PATH
+      value: /opt/rh/rh-python36/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    - name: TERM
+      value: xterm
+    - name: HOSTNAME
+    - name: container
+      value: podman
+    - name: POSTGRESQL_USER
+      value: vmaas_writer
+    - name: POSTGRESQL_PASSWORD
+      value: vmaas_writer_pwd
+    - name: RETRY_COUNT
+      value: "3"
+    - name: PKGTREE_KEEP_COPIES
+      value: "2"
+    - name: VMAAS_VERSION
+      value: latest
+    - name: MANIFEST_PREFIX
+      value: mgmt_services:latest:vmaas-reposcan\/
+    - name: BATCH_MAX_SIZE
+      value: "500"
+    - name: PKGTREE_INDENT
+      value: "0"
+    - name: REPOSCAN_SYNC_INTERVAL_MINUTES
+      value: "360"
+    - name: CHUNK_SIZE
+      value: "1048576"
+    - name: BATCH_MAX_FILESIZE
+      value: "14_000_000_000"
+    - name: YEAR_SINCE
+      value: "2002"
+    - name: LANG
+      value: en_US.utf8
+    - name: MANIFEST_PYTHON
+      value: python
+    - name: POSTGRESQL_HOST
+      value: vmaas_database
+    - name: POSTGRESQL_PORT
+      value: "5432"
+    - name: KEEP_COPIES
+      value: "3"
+    - name: LOGGING_TYPE
+      value: DEVEL
+    - name: THREADS
+      value: "8"
+    - name: WEBSOCKET_HOST
+      value: vmaas_websocket
+    - name: AUTHORIZED_API_ORG
+      value: RedHatInsights
+    - name: LC_ALL
+      value: en_US.utf8
+    - name: POSTGRESQL_DATABASE
+      value: vmaas
+    - name: LOGGING_LEVEL
+      value: INFO
+    image: localhost/vmaas/reposcan:latest
+    name: vmaas-reposcan
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: true
+      capabilities: {}
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsUser: 1000
+    ports:
+      - containerPort: 8081
+        hostPort: 8081
+        protocol: TCP
+      - containerPort: 8730
+        hostPort: 8730
+    volumeMounts:
+    - mountPath: /data
+      name: var-lib-containers-storage-volumes-vmaas_vmaas-dump-data-_data
+    - mountPath: /tmp
+      name: var-lib-containers-storage-volumes-vmaas_vmaas-reposcan-tmp-_data
+    workingDir: /reposcan
+  - command:
+    - /bin/sh
+    - -c
+    - /webapp_utils/entrypoint.sh
+    env:
+    - name: PATH
+      value: /opt/rh/rh-python36/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    - name: TERM
+      value: xterm
+    - name: HOSTNAME
+    - name: container
+      value: podman
+    - name: LANG
+      value: en_US.utf8
+    - name: GUNICORN_WORKERS
+      value: "4"
+    - name: POSTGRESQL_USER
+      value: vmaas_reader
+    - name: POSTGRESQL_DATABASE
+      value: vmaas
+    - name: POSTGRESQL_HOST
+      value: vmaas_database
+    - name: POSTGRESQL_PORT
+      value: "5432"
+    - name: VMAAS_VERSION
+      value: latest
+    - name: MANIFEST_PREFIX
+      value: mgmt_services:latest:vmaas-webapp-utils\/
+    - name: MANIFEST_PYTHON
+      value: python
+    - name: POSTGRESQL_PASSWORD
+      value: vmaas_reader_pwd
+    - name: LC_ALL
+      value: en_US.utf8
+    image: localhost/vmaas/webapp_utils:latest
+    name: vmaas-webapp-utils
+    resources: {}
+    securityContext: 
+      allowPrivilegeEscalation: true
+      capabilities: {}
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsUser: 1000
+    ports:
+      - containerPort: 8083
+        hostPort: 8083
+        protocol: TCP
+    workingDir: /webapp_utils
+  - command:
+    - sh
+    - /usr/share/nginx/docker-run.sh
+    env:
+    - name: PATH
+      value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    - name: TERM
+      value: xterm
+    - name: HOSTNAME
+    - name: container
+      value: podman
+    - name: API_URLS
+      value: '[{url:''http://localhost:8080/api/v1/apispec'', name:''webapp''},{url:''http://localhost:8081/api/v1/apispec'',
+        name:''reposcan''},{url:''http://localhost:8083/api/openapi.json'', name:''webapp-utils''}]'
+    - name: OAUTH_CLIENT_ID
+      value: '**None**'
+    - name: OAUTH_CLIENT_SECRET
+      value: '**None**'
+    - name: PORT
+      value: "8080"
+    - name: BASE_URL
+    - name: API_URL
+      value: http://petstore.swagger.io/v2/swagger.json
+    - name: API_KEY
+      value: '**None**'
+    - name: OAUTH_REALM
+      value: '**None**'
+    - name: SWAGGER_JSON
+      value: /app/swagger.json
+    - name: OAUTH_ADDITIONAL_PARAMS
+      value: '**None**'
+    - name: VERSION
+      value: v2.2.10
+    - name: FOLDER
+      value: swagger-ui-2.2.10
+    - name: OAUTH_APP_NAME
+      value: '**None**'
+    image: localhost/vmaas/apidoc:latest
+    name: vmaas-apidoc
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: true
+      capabilities: {}
+      privileged: false
+      readOnlyRootFilesystem: false
+    ports:
+      - containerPort: 8080
+        hostPort: 8000
+        protocol: TCP
+    workingDir: /
+  - command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    - --storage.tsdb.path=/prometheus
+    - --web.console.libraries=/usr/share/prometheus/console_libraries
+    - --web.console.templates=/usr/share/prometheus/consoles
+    env:
+    - name: PATH
+      value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    - name: TERM
+      value: xterm
+    - name: HOSTNAME
+    - name: container
+      value: podman
+    image: docker.io/prom/prometheus:v2.1.0
+    name: vmaas-prometheus
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: true
+      capabilities: {}
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsUser: 65534
+    volumeMounts:
+    - mountPath: /prometheus
+      name: var-lib-containers-storage-volumes-vmaas_prometheus-data-_data
+    - mountPath: /etc/prometheus/prometheus.yml
+      name: root-vmaas-monitoring-prometheus-prometheus.yml
+    workingDir: /prometheus
+  volumes:
+  - hostPath:
+      path: /var/lib/containers/storage/volumes/vmaas_vmaas-db-data/_data
+      type: Directory
+    name: var-lib-containers-storage-volumes-vmaas_vmaas-db-data-_data
+  - hostPath:
+      path: /var/lib/containers/storage/volumes/vmaas_vmaas-dump-data/_data
+      type: Directory
+    name: var-lib-containers-storage-volumes-vmaas_vmaas-dump-data-_data
+  - hostPath:
+      path: /var/lib/containers/storage/volumes/vmaas_vmaas-reposcan-tmp/_data
+      type: Directory
+    name: var-lib-containers-storage-volumes-vmaas_vmaas-reposcan-tmp-_data
+  - hostPath:
+      path: /var/lib/containers/storage/volumes/vmaas_prometheus-data/_data
+      type: Directory
+    name: var-lib-containers-storage-volumes-vmaas_prometheus-data-_data
+  - hostPath:
+      path: /root/vmaas/monitoring/prometheus/prometheus.yml
+      type: File
+    name: root-vmaas-monitoring-prometheus-prometheus.yml
+restartPolicy: OnFailure
+status: {}
