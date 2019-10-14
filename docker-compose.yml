@@ -13,7 +13,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - vmaas-db-data:/var/lib/pgsql/data
+      - /var/vmaas/vmaas-db-data:/var/lib/pgsql/data:z
 
   vmaas_websocket:
     container_name: vmaas-websocket
@@ -39,8 +39,8 @@ services:
       - 8081:8081
       - 8730:8730
     volumes:
-      - vmaas-reposcan-tmp:/tmp
-      - vmaas-dump-data:/data:z
+      - /var/vmaas/vmaas-reposcan-tmp:/tmp:z
+      - /var/vmaas/vmaas-dump-data:/data:z
     depends_on:
       - vmaas_websocket
       - vmaas_database
@@ -76,12 +76,11 @@ services:
     depends_on:
       - vmaas_webapp
 
-
   vmaas_prometheus:
     container_name: vmaas-prometheus
     image: prom/prometheus:v2.1.0
     volumes:
-      - prometheus-data:/prometheus
+      - /var/vmaas/prometheus-data:/prometheus
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     security_opt:
       - label=disable
@@ -101,7 +100,7 @@ services:
     container_name: vmaas-grafana
     image: grafana/grafana:6.2.5
     volumes:
-      - grafana-data:/var/lib/grafana
+      - /var/vmaas/grafana-data:/var/lib/grafana
       - ./monitoring/grafana/provisioning/:/etc/grafana/provisioning/
     depends_on:
       - vmaas_prometheus
@@ -113,8 +112,8 @@ services:
     restart: always
 
 volumes:
-  vmaas-db-data:
-  vmaas-dump-data:
-  vmaas-reposcan-tmp:
-  prometheus-data:
-  grafana-data:
+  /var/vmaas/vmaas-db-data:
+  /var/vmaas/vmaas-dump-data:
+  /var/vmaas/vmaas-reposcan-tmp:
+  /var/vmaas/prometheus-data:
+  /var/vmaas/grafana-data:
