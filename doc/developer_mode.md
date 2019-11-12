@@ -1,12 +1,11 @@
 # Develop with separate containers running
 1. Build your container in "developer mode":
 ~~~bash
-./scripts/devel-compose build --no-cache
-./scripts/devel-compose up
+./scripts/devel-compose up --build
 ~~~
 2. Switch into **webapp** container:
 ~~~bash
-docker-compose exec vmaas_webapp bash
+sudo podman exec vmaas-webapp bash
 ~~~
 Now your local git directory is mounted under `/git` in the container so any change
 you make you can immediatelly test.
@@ -25,7 +24,7 @@ Now you have bash inside vmaas_webapp container, run:
 
 3. Switch to **webapp_utils** container:
 ~~~bash
-docker-compose exec vmaas_webapp_utils bash
+sudo podman exec vmaas-webapp-utils bash
 ~~~
 Now run:
 
@@ -33,7 +32,7 @@ Now run:
 
 4. Switch into **websocket** container:
 ~~~bash
-docker-compose exec vmaas_websocket bash
+sudo podman exec vmaas-websocket bash
 ~~~
 Now run:
 
@@ -41,7 +40,7 @@ Now run:
 
 5. Switch into **reposcan** container:
 ~~~bash
-docker-compose exec vmaas_reposcan bash
+sudo podman exec vmaas-reposcan bash
 ~~~
 Now run:
 
@@ -49,7 +48,7 @@ Now run:
 
 6. Switch to **database** container to gain access to db:
 ~~~bash
-docker-compose exec vmaas_database bash
+sudo podman exec vmaas-database bash
 ~~~
 Now you can run database terminal with:
 
