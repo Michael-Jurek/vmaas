@@ -42,6 +42,7 @@ class PackagesAPI:
         for pkg in packages:
             packagedata = packagelist.setdefault(pkg, {})
             name, epoch, ver, rel, arch = utils.split_packagename(pkg)
+            # already solved occurence of package name under
             if name in self.cache.packagename2id \
                and (epoch, ver, rel) in self.cache.evr2id \
                and arch in self.cache.arch2id:
@@ -50,6 +51,7 @@ class PackagesAPI:
                 arch_id = self.cache.arch2id[arch]
                 if (name_id, evr_id, arch_id) in self.cache.nevra2pkgid:
                     pkg_id = self.cache.nevra2pkgid[(name_id, evr_id, arch_id)]
+                    #if pkg_id in self.cache.package_details:
                     pkg_detail = self.cache.package_details[pkg_id]
                     packagedata['summary'] = self.cache.strings.get(pkg_detail[PKG_SUMMARY_ID], None)
                     packagedata['description'] = self.cache.strings.get(pkg_detail[PKG_DESC_ID], None)

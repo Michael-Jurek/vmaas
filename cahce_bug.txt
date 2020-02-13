@@ -1,0 +1,64 @@
+for nevra_id in c.__dict__['nevra2pkgid']:
+    print(nevra_id, '->', c.__dict__['nevra2pkgid'][nevra_id])
+
+--> nevra id a pkgid
+
+
+details = c.__dict__['package_details']
+for pkg_id in details:
+    print(pkg_id, '->', details[pkg_id])
+
+============================================================================
+============================================================================
+
+import cache
+c = cache.Cache()
+
+details = c.package_details
+
+for nevra_id in c.__dict__['nevra2pkgid']:
+    print("nevra_id: %s"%str(nevra_id))
+    pkg_id = c.__dict__['nevra2pkgid'][nevra_id]
+    print("pkg_id: %d"%pkg_id)
+    for pkg_id_details in details:
+        if int(pkg_id) == pkg_id_details:
+            print("package_details: %s" % details[pkg_id_details])
+            src_pkg_id = details[pkg_id_details][5]
+            print("source_package_id: %s"%src_pkg_id)
+            if src_pkg_id:
+                print("source_package_details: %s" % c.package_details[src_pkg_id])
+    
+    print()
+    
+    # failes for c.package_details[126215]
+    #
+    =============================================================================
+
+    # pocet zaznamu v c.package_details je 131503
+    len(c.package_details)
+
+    # database 275644 zaznamu --> package names with received security update
+     pro
+     select distinct count(*) from package_name pn inner join
+                                     package p on pn.id = p.name_id inner join
+                                     pkg_errata pe on p.id = pe.pkg_id inner join
+                                     errata e on pe.errata_id = e.id inner join
+                                     errata_type et on e.errata_type_id = et.id left join
+                                     errata_cve ec on e.id = ec.errata_id;
+
+    # celkovy pocet packages - 142695
+    select count(*) from package;
+
+    # zaznamy kde je source id - 120430
+    select count(*) from package where source_package_id>0;
+
+    # celkovy pocey package name  10687
+    select count(*) from package_name;
+
+
+select distinct pn.id, pn.name from package_name pn inner join
+                                     package p on pn.id = p.name_id inner join
+                                     pkg_errata pe on p.id = pe.pkg_id inner join
+                                     errata e on pe.errata_id = e.id inner join
+                                     errata_type et on e.errata_type_id = et.id left join
+                                     errata_cve ec on e.id = ec.errata_id;
