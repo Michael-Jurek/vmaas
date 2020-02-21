@@ -25,6 +25,7 @@ from updates import UpdatesAPI
 from errata import ErrataAPI
 from packages import PackagesAPI
 from pkgtree import PkgtreeAPI
+from rpm import RpmAPI
 from vulnerabilities import VulnerabilitiesAPI
 from dbchange import DBChange
 from probes import REQUEST_COUNTS, REQUEST_TIME
@@ -48,6 +49,7 @@ class BaseHandler:
     packages_api = None
     pkgtree_api = None
     vulnerabilities_api = None
+    rpms_api = None
     dbchange_api = None
 
     @classmethod
@@ -315,6 +317,14 @@ class VulnerabilitiesHandlerPost(BaseHandler):
         """List of applicable CVEs to a package list. """
         return await cls.handle_request(cls.vulnerabilities_api, 1, **kwargs)
 
+class RpmHandlerPost(BaseHandler):
+    """Handler for processing /rpm POST requests."""
+
+    @classmethod
+    async def post(cls, **kwargs):
+        """Get rpms for srpm and product family."""
+        return await cls.handle_request(cls.rpms_api, 1, **kwargs)
+
 
 class Websocket:
     """ main websocket handling class"""
@@ -388,6 +398,7 @@ def load_cache_to_apis():
     BaseHandler.packages_api = PackagesAPI(BaseHandler.db_cache)
     BaseHandler.pkgtree_api = PkgtreeAPI(BaseHandler.db_cache)
     BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
+    BaseHandler.rpms_api = RpmAPI(BaseHandler.db_cache)
     BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
 
 

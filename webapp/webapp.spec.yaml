@@ -431,6 +431,26 @@ paths:
                 $ref: '#/components/schemas/VulnerabilitiesResponse'
       tags:
         - vulnerabilities
+
+  /v1/rpms:
+    post:
+      description: List of rpms to given srpm and product familly.
+      operationId: app.RpmHandlerPost.post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RpmsRequest'
+      responses:
+        '200':
+          description: List of rpms to given srpm and product familly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RpmsResponse'
+        <<: *format_resps
+      tags:
+        - rpms
 tags: []
 
 x-paging-info: &req_paging
@@ -1048,3 +1068,28 @@ components:
           items:
             type: string
             example: CVE-2016-0800
+    RpmsRequest:
+      type: object
+      properties:
+        srpm:
+          type: string
+          example: openssl
+        product_familly:
+          type: string
+          example: rhel-7
+      required:
+        - srpm
+        - product_familly
+    RpmsResponse:
+      type: object
+      properties:
+        rhel-6-desktop-rpms:
+          type: array
+          items:
+            type: string
+            example: openssl
+        rhel-6-server-rpms:
+          type: array
+          items:
+            type: string
+            example: openssl-static
